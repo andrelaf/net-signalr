@@ -427,3 +427,17 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ---- Node / React client ----
+client/node_modules/
+client/dist/
+client/.vite/
+*.local
+
+# ---- SQLite demo db ----
+*.db
+*.db-shm
+*.db-wal
+
+# ---- Uploads (demo) ----
+src/SignalRDemo.Api/uploads/

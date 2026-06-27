@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SignalRDemo.Api/SignalRDemo.Api.csproj" />
+    <Project Path="src/SignalRDemo.Domain/SignalRDemo.Domain.csproj" />
+    <Project Path="src/SignalRDemo.Infrastructure/SignalRDemo.Infrastructure.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/node_modules/
+client/dist/
+**/*.db
+**/*.db-shm
+**/*.db-wal
+src/SignalRDemo.Api/uploads/
+.git/

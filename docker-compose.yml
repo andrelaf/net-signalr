@@ -1,0 +1,62 @@
+# Demonstração de SCALE-OUT horizontal do SignalR (perfil "scaleout").
+#
+# Por padrão, o projeto roda single-node e portátil com `dotnet run` (sem Docker).
+# Para demonstrar o backplane Redis distribuindo mensagens entre múltiplos nós:
+#
+#   docker compose --profile scaleout up --build
+#
+# Acesse http://localhost:8080 (nginx faz o balanceamento entre api1 e api2).
+# Mensagens publicadas num nó chegam aos clientes conectados no outro nó via Redis.
+services:
+  redis:
+    image: redis:7-alpine
+    profiles: ["scaleout"]
+    ports:
+      - "6379:6379"
+
+  api1:
+    build:
+      context: .
+      dockerfile: src/SignalRDemo.Api/Dockerfile
+    profiles: ["scaleout"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      SignalR__Backplane: "Redis"
+      SignalR__RedisConnection: "redis:6379"
+      # SQLite compartilhado via volume (ver nota sobre limitações no README).
+      ConnectionStrings__Default: "Data Source=/data/workspace.db"
+      Cors__ClientOrigins__0: "http://localhost:8080"
+    volumes:
+      - dbdata:/data
+    depends_on:
+      - redis
+
+  api2:
+    build:
+      context: .
+      dockerfile: src/SignalRDemo.Api/Dockerfile
+    profiles: ["scaleout"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      SignalR__Backplane: "Redis"
+      SignalR__RedisConnection: "redis:6379"
+      ConnectionStrings__Default: "Data Source=/data/workspace.db"
+      Cors__ClientOrigins__0: "http://localhost:8080"
+    volumes:
+      - dbdata:/data
+    depends_on:
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    profiles: ["scaleout"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
+
+volumes:
+  dbdata:
